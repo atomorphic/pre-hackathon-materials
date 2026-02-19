@@ -1,6 +1,6 @@
 # Pre-Hackathon Learning Materials
 
-> **Hospital AI Factory - NUS Intern Hackathon 2026**  
+> **Atomorphic Mini Hackathon - NUS Q1 2026**  
 > Read and explore these materials **before** the hackathon day
 
 ---
@@ -68,7 +68,7 @@ python -m http.server 8080
 
 To play with the simple viewer, you need DICOM files:
 
-- Download from [LIDC-IDRI](https://wiki.cancerimagingarchive.net/display/Public/LIDC-IDRI)
+- Download from [LIDC-IDRI](https://www.cancerimagingarchive.net/collection/lidc-idri/)
 - Or search "sample DICOM files download" online
 - Or use [OsiriX sample data](https://www.osirix-viewer.com/resources/dicom-image-library/)
 

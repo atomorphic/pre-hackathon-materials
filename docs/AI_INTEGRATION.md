@@ -1,6 +1,6 @@
 # AI Integration Guide
 
-> **Pre-Hackathon Reading Material**  
+> **Atomorphic Mini Hackathon - Pre-Hackathon Reading**  
 > Estimated reading time: 20-30 minutes
 
 ---
@@ -141,40 +141,7 @@ with open('segmentation.nii.gz', 'wb') as f:
 3. Register with segmentation module
 4. Display as overlay
 
-### Key APIs
-
-```typescript
-import { volumeLoader } from '@cornerstonejs/core';
-import { segmentation, Enums } from '@cornerstonejs/tools';
-
-// 1. Create labelmap volume
-const segVolume = volumeLoader.createAndCacheDerivedLabelmapVolume(
-  sourceVolumeId,
-  { volumeId: 'segmentation' }
-);
-
-// 2. Fill with data (from NIfTI)
-// ... copy segmentation data into segVolume ...
-
-// 3. Register
-segmentation.addSegmentations([{
-  segmentationId: 'segmentation',
-  representation: {
-    type: Enums.SegmentationRepresentations.Labelmap,
-    data: { volumeId: 'segmentation' },
-  },
-}]);
-
-// 4. Display
-await segmentation.addLabelmapRepresentationToViewportMap({
-  [viewportId]: [{ segmentationId: 'segmentation' }],
-});
-
-// 5. Set colors
-segmentation.config.color.setColorForSegmentIndex(
-  'segmentation', 1, [255, 0, 0, 128]
-);
-```
+> See `CORNERSTONE_GUIDE.md` — Segmentation section for the full API reference and code examples.
 
 ---
 
@@ -201,3 +168,9 @@ Overlay display
 2. Pre-compute results if model is slow
 3. Verify alignment - segmentation must match source volume
 4. Check orientation (RAS vs LPS)
+
+---
+
+## Next Steps
+
+You're done with the reading materials! Open `simple-viewer/index.html` and experiment hands-on.

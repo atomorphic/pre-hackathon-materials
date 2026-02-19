@@ -1,6 +1,6 @@
 # LIDC-IDRI Dataset Guide
 
-> **Pre-Hackathon Reading Material**  
+> **Atomorphic Mini Hackathon - Pre-Hackathon Reading**  
 > Estimated reading time: 20-30 minutes
 
 ---
@@ -146,5 +146,11 @@ Steps:
 
 ## Dataset Access
 
-- Download: https://wiki.cancerimagingarchive.net/display/Public/LIDC-IDRI
+- Download: https://www.cancerimagingarchive.net/collection/lidc-idri/
 - Python library: `pip install pylidc`
+
+---
+
+## Next Steps
+
+Continue to `AI_INTEGRATION.md` to learn about AI segmentation tools.

@@ -1,6 +1,6 @@
 # Background Knowledge: Medical Imaging & DICOM
 
-> **Pre-Hackathon Reading Material**  
+> **Atomorphic Mini Hackathon - Pre-Hackathon Reading**  
 > Estimated reading time: 30-45 minutes
 
 ---

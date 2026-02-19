@@ -1,6 +1,6 @@
 # Cornerstone3D Guide
 
-> **Pre-Hackathon Reading Material**  
+> **Atomorphic Mini Hackathon - Pre-Hackathon Reading**  
 > Estimated reading time: 45-60 minutes
 
 ---
@@ -281,7 +281,7 @@ segmentation.addSegmentations([{
 
 // 3. Display on viewport
 await segmentation.addLabelmapRepresentationToViewportMap({
-  ['viewportId']: [{ segmentationId: 'mySegmentation' }],
+  [viewportId]: [{ segmentationId: 'mySegmentation' }],
 });
 ```
 
