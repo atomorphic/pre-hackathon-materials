@@ -164,7 +164,9 @@ export default function App() {
     if (!re) return
     const vp = re.getViewport(VIEWPORT_ID) as any
     vp?.resetCamera?.()
+    vp?.resetProperties?.()   // resets VOI (window/level) to DICOM default
     vp?.render?.()
+    setInfo(prev => ({ ...prev, wl: '--' }))
     setStatus('View reset')
   }, [])
 

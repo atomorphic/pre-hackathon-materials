@@ -115,13 +115,18 @@ export function initTools() {
 }
 
 // ─── Switch the active annotation tool ───────────────────────────────────────
+// Passivates ALL other primary-mouse tools (nav + other annotation tools)
+// so only one tool owns the left mouse button at a time.
 export function setActiveTool(toolName: string) {
-  const annotationTools = [
+  const allPrimaryTools = [
+    WindowLevelTool.toolName,
+    PanTool.toolName,
+    ZoomTool.toolName,
     LengthTool.toolName,
     RectangleROITool.toolName,
     EllipticalROITool.toolName,
   ]
-  annotationTools.forEach(t => {
+  allPrimaryTools.forEach(t => {
     try { toolGroup.setToolPassive(t) } catch { /* not active */ }
   })
   toolGroup.setToolActive(toolName, {
