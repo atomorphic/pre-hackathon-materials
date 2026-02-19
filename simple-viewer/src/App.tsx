@@ -16,7 +16,7 @@ import {
   getRenderingEngine,
   VIEWPORT_ID,
 } from './cornerstone'
-import { loadDicomFiles, getImageIds } from './loader'
+import { loadDicomFiles, loadSampleData, getImageIds } from './loader'
 import {
   WindowLevelTool,
   PanTool,
@@ -62,8 +62,17 @@ export default function App() {
         await initCornerstone()
         initViewport(el)
         initTools()
+
+        // Try to auto-load sample data from public/data/
+        const n = await loadSampleData()
+        if (n > 0) {
+          setInfo(prev => ({ ...prev, slice: String(Math.floor(n / 2) + 1), total: String(n) }))
+          setStatus(`Loaded ${n} sample images — try scrolling (fix TODO 1 first!)`)
+        } else {
+          setStatus('Ready — load DICOM files to begin')
+        }
+
         setReady(true)
-        setStatus('Ready — load DICOM files to begin')
       } catch (err) {
         setStatus(`Error: ${err instanceof Error ? err.message : String(err)}`)
       }

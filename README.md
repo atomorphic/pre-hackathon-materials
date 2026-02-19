@@ -14,7 +14,7 @@ This folder contains **learning materials only** - no hackathon code to submit.
 | `docs/BACKGROUND.md` | Reading | 30-45 min | Medical imaging fundamentals |
 | `docs/CORNERSTONE_GUIDE.md` | Reading | 45-60 min | Cornerstone3D concepts & APIs |
 | `docs/LIDC_DATA_GUIDE.md` | Reading | 20-30 min | LIDC dataset and XML format |
-| `docs/AI_INTEGRATION.md` | Reading | 20-30 min | MONAI/TotalSegmentator concepts |
+| `docs/MEDICAL_AI_MODEL.md` | Reading | 20-30 min | MONAI/TotalSegmentator concepts |
 
 ---
 
@@ -23,7 +23,7 @@ This folder contains **learning materials only** - no hackathon code to submit.
 1. **Start with** `docs/BACKGROUND.md` - understand medical imaging basics
 2. **Then read** `docs/CORNERSTONE_GUIDE.md` - learn the viewer library
 3. **Then read** `docs/LIDC_DATA_GUIDE.md` - understand the annotation format
-4. **Finally skim** `docs/AI_INTEGRATION.md` - AI segmentation concepts
+4. **Finally skim** `docs/MEDICAL_AI_MODEL.md` - AI segmentation concepts
 
 ---
 

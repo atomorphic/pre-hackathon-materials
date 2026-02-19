@@ -9,7 +9,9 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173, click **Load DICOM**, and select some `.dcm` files.
+Open http://localhost:5173 — the viewer will **auto-load sample DICOM images** from `data/sample_dicom/` on startup (once TODO 1 is fixed, you can scroll through them with the mouse wheel).
+
+You can also click **Load DICOM** to load your own `.dcm` files.
 
 ## Your Tasks
 
@@ -37,5 +39,6 @@ Each TODO has a comment in the code explaining exactly what to do.
 
 ## Getting Sample DICOM Files
 
-- [LIDC-IDRI on TCIA](https://www.cancerimagingarchive.net/collection/lidc-idri/) — the dataset used on hackathon day
-- [OsiriX sample data](https://www.osirix-viewer.com/resources/dicom-image-library/) — quick alternative
+Sample data is already included in `data/sample_dicom/` — 133 slices from LIDC-IDRI-0001, the same dataset used on hackathon day. No download needed.
+
+If you want to experiment with other cases: [LIDC-IDRI on TCIA](https://www.cancerimagingarchive.net/collection/lidc-idri/)
