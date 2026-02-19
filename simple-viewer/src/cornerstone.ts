@@ -33,19 +33,24 @@ export const TOOLGROUP_ID = 'learningToolGroup'
 
 let renderingEngine: RenderingEngine
 let toolGroup: ToolTypes.IToolGroup
+let initialised = false
 
 export function getRenderingEngine() { return renderingEngine }
 export function getToolGroup() { return toolGroup }
 
 // ─── Step 1: Initialise all three packages ───────────────────────────────────
 export async function initCornerstone() {
+  if (initialised) return
   await coreInit()
   await dicomLoader.init()
   await toolsInit()
+  initialised = true
 }
 
 // ─── Step 2: Create a Stack viewport ─────────────────────────────────────────
 export function initViewport(element: HTMLDivElement) {
+  // Destroy any previous engine (handles React StrictMode double-invoke)
+  try { renderingEngine?.destroy() } catch { /* ok */ }
   renderingEngine = new RenderingEngine(ENGINE_ID)
   renderingEngine.enableElement({
     viewportId: VIEWPORT_ID,
@@ -56,15 +61,13 @@ export function initViewport(element: HTMLDivElement) {
 
 // ─── Step 3: Register and configure tools ────────────────────────────────────
 export function initTools() {
-  // Register every tool class globally (once per app lifetime)
-  addTool(WindowLevelTool)
-  addTool(PanTool)
-  addTool(ZoomTool)
-  addTool(StackScrollTool)
-  addTool(LengthTool)
-  addTool(RectangleROITool)
-  addTool(EllipticalROITool)
+  // addTool is idempotent — wrap in try/catch for safety
+  const tools = [WindowLevelTool, PanTool, ZoomTool, StackScrollTool,
+                 LengthTool, RectangleROITool, EllipticalROITool]
+  tools.forEach(t => { try { addTool(t) } catch { /* already registered */ } })
 
+  // Destroy previous tool group if it exists (handles StrictMode re-init)
+  try { ToolGroupManager.destroyToolGroup(TOOLGROUP_ID) } catch { /* ok */ }
   // A ToolGroup links a set of tools to one or more viewports
   toolGroup = ToolGroupManager.createToolGroup(TOOLGROUP_ID)!
 
