@@ -2,8 +2,8 @@
 // Simple DICOM Viewer — Learning Example
 // =============================================================================
 // This is a fully working React + Cornerstone3D viewer.
-// Three places are left incomplete for you to fill in (marked TODO 1–3).
-// Everything else is intentionally complete so you can focus on learning.
+// Read through the code to understand the patterns used.
+// Three curiosity prompts are scattered in comments — try them if you like!
 // =============================================================================
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -26,7 +26,7 @@ import {
   RectangleROITool,
   EllipticalROITool,
 } from '@cornerstonejs/tools'
-import { Enums as CoreEnums, eventTarget } from '@cornerstonejs/core'
+import { Enums as CoreEnums } from '@cornerstonejs/core'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 type NavTool   = 'WindowLevel' | 'Pan' | 'Zoom'
@@ -36,7 +36,7 @@ type ActiveTool = NavTool | DrawTool
 interface Info {
   slice: string
   total: string
-  wl: string      // ← TODO 3 will populate this
+  wl: string
   patientName: string
 }
 
@@ -71,7 +71,7 @@ export default function App() {
         const n = await loadSampleData()
         if (n > 0) {
           setInfo(prev => ({ ...prev, slice: String(Math.floor(n / 2) + 1), total: String(n) }))
-          setStatus(`Loaded ${n} sample images — try scrolling (fix TODO 1 first!)`)
+          setStatus(`Loaded ${n} sample images — scroll to navigate`)
         } else {
           setStatus('Ready — load DICOM files to begin')
         }
@@ -104,25 +104,21 @@ export default function App() {
     return () => el.removeEventListener(CoreEnums.Events.STACK_VIEWPORT_SCROLL, handleSliceChange)
   }, [ready])
 
-  // ── Listen for W/L changes ─────────────────────────────────────────────────
-  //
-  // TODO 3 — Display live Window/Level values in the info panel.
-  //
-  // When the user drags to adjust brightness/contrast, Cornerstone fires a
-  // VOI_MODIFIED event. Listen for it and update info.wl.
-  //
-  // The event detail contains: { volumeId?, viewportId, range: { lower, upper } }
-  // Window = upper - lower,  Centre = (upper + lower) / 2
-  //
-  // Steps:
-  //   1. Add an event listener for CoreEvents.VOI_MODIFIED on `el`
-  //   2. Calculate W and L from event.detail.range
-  //   3. Call setInfo(prev => ({ ...prev, wl: `${W} / ${L}` }))
-  //   4. Remember to return a cleanup function (removeEventListener)
-  //
+  // ── Listen for W/L changes to display live values ─────────────────────────
   useEffect(() => {
     if (!ready || !viewportRef.current) return
-    // TODO 3: implement W/L display here
+    const el = viewportRef.current
+
+    const handleVOI = (evt: Event) => {
+      const { range } = (evt as CustomEvent).detail
+      if (!range) return
+      const W = Math.round(range.upper - range.lower)
+      const L = Math.round((range.upper + range.lower) / 2)
+      setInfo(prev => ({ ...prev, wl: `W ${W} / L ${L}` }))
+    }
+
+    el.addEventListener(CoreEnums.Events.VOI_MODIFIED, handleVOI)
+    return () => el.removeEventListener(CoreEnums.Events.VOI_MODIFIED, handleVOI)
   }, [ready])
 
   // ── File loading ───────────────────────────────────────────────────────────
@@ -174,7 +170,7 @@ export default function App() {
 
   // ==========================================================================
   return (
-    <div id="root" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
 
       {/* Header */}
       <header className="header">
@@ -233,18 +229,13 @@ export default function App() {
           >
             Rectangle
           </button>
-
-          {/*
-           * TODO 2 — Add an Ellipse tool button.
-           *
-           * EllipticalROITool is already registered in cornerstone.ts.
-           * Add a button here that:
-           *   - is disabled when !ready
-           *   - gets className 'active' when activeTool === 'EllipticalROI'
-           *   - calls handleDrawTool('EllipticalROI') on click
-           *
-           * <button ...>Ellipse</button>
-           */}
+          <button
+            disabled={!ready}
+            className={activeTool === 'EllipticalROI' ? 'active' : ''}
+            onClick={() => handleDrawTool('EllipticalROI')}
+          >
+            Ellipse
+          </button>
         </div>
 
         <div className="divider" />
@@ -267,14 +258,16 @@ export default function App() {
               <span className="info-value">{info.slice} / {info.total}</span>
             </div>
 
+            {/*
+             * Curiosity prompt — Slice info overlay
+             * The slice counter is shown here in the sidebar. Could you also
+             * render it as a text overlay directly on the canvas?
+             * Hint: an absolutely-positioned <div> on top of viewport-wrapper.
+             */}
+
             <div className="info-row">
               <span className="info-label">Window / Level</span>
-              {/* TODO 3 will make this show live values */}
-              <span className="info-value todo-field">
-                {info.wl === '--'
-                  ? '← TODO 3: implement W/L display'
-                  : info.wl}
-              </span>
+              <span className="info-value">{info.wl === '--' ? '— drag to adjust —' : info.wl}</span>
             </div>
 
             <div className="info-row">
@@ -284,29 +277,20 @@ export default function App() {
 
           </div>
 
-          {/* TODO callouts */}
-          <div className="todo-callout">
-            <strong>TODO 1 — Scroll wheel</strong>
-            Open <code>src/cornerstone.ts</code> and activate
-            <code> StackScrollTool</code> with the Wheel binding.
-          </div>
-          <div className="todo-callout">
-            <strong>TODO 2 — Ellipse button</strong>
-            Add the Ellipse tool button to the toolbar in
-            <code> src/App.tsx</code>.
-          </div>
-          <div className="todo-callout">
-            <strong>TODO 3 — W/L display</strong>
-            Listen for <code>VOI_MODIFIED</code> in
-            <code> src/App.tsx</code> and show live values above.
-          </div>
+          {/*
+           * Curiosity prompt — Tool cursor
+           * The active tool name is shown in the toolbar button.
+           * Could you also change the CSS cursor on the viewport element
+           * to give visual feedback — crosshair when drawing, move when panning?
+           * Hint: viewportRef.current.style.cursor = '...'
+           */}
 
           <div className="instructions">
             <strong>How to use:</strong><br />
-            1. Click Load DICOM<br />
-            2. Select .dcm files<br />
-            3. Fix TODO 1 — then scroll!<br />
-            4. Draw annotations with Length / Rect
+            1. Click Load DICOM (or sample data loads automatically)<br />
+            2. Scroll to navigate slices<br />
+            3. Draw annotations with Length / Rect / Ellipse<br />
+            4. Drag with W/L active to adjust brightness
           </div>
         </aside>
 

@@ -1,7 +1,7 @@
 # LIDC-IDRI Dataset Guide
 
 > **Atomorphic Mini Hackathon - Pre-Hackathon Reading**  
-> Estimated reading time: 20-30 minutes
+> Estimated reading time: ~10 minutes
 
 ---
 
@@ -83,45 +83,42 @@
 
 ## Parsing Example (Python)
 
+> Verified against the sample XML in `simple-viewer/public/data/sample_annotations/069.xml`.
+
+The LIDC XML uses a default namespace (`xmlns="http://www.nih.gov"`), so you must include it in all tag searches:
+
 ```python
 import xml.etree.ElementTree as ET
+
+NS = 'http://www.nih.gov'
+
+def tag(name):
+    return f'{{{NS}}}{name}'
 
 def parse_lidc_xml(xml_path):
     tree = ET.parse(xml_path)
     root = tree.getroot()
-    
     nodules = []
-    
-    for session in root.findall('.//readingSession'):
-        for nodule in session.findall('unblindedReadNodule'):
-            nodule_id = nodule.find('noduleID').text
-            
-            # Get malignancy
-            chars = nodule.find('characteristics')
-            malignancy = int(chars.find('malignancy').text)
-            
-            # Get contours
+
+    for session in root.findall(f'.//{tag("readingSession")}'):
+        for nodule in session.findall(tag('unblindedReadNodule')):
+            nodule_id = nodule.find(tag('noduleID')).text
+
+            chars = nodule.find(tag('characteristics'))
+            m_el = chars.find(tag('malignancy')) if chars is not None else None
+            malignancy = int(m_el.text) if m_el is not None else None
+
             contours = []
-            for roi in nodule.findall('roi'):
-                z_pos = float(roi.find('imageZposition').text)
-                
-                points = []
-                for edge in roi.findall('edgeMap'):
-                    x = int(edge.find('xCoord').text)
-                    y = int(edge.find('yCoord').text)
-                    points.append((x, y))
-                
-                contours.append({
-                    'z': z_pos,
-                    'points': points
-                })
-            
-            nodules.append({
-                'id': nodule_id,
-                'malignancy': malignancy,
-                'contours': contours
-            })
-    
+            for roi in nodule.findall(tag('roi')):
+                z_pos = float(roi.find(tag('imageZposition')).text)
+                points = [
+                    (int(e.find(tag('xCoord')).text), int(e.find(tag('yCoord')).text))
+                    for e in roi.findall(tag('edgeMap'))
+                ]
+                contours.append({'z': z_pos, 'points': points})
+
+            nodules.append({'id': nodule_id, 'malignancy': malignancy, 'contours': contours})
+
     return nodules
 ```
 
@@ -134,13 +131,15 @@ XML contains **pixel coordinates** (x, y) and **Z position in mm**.
 To display in Cornerstone3D, you need **world coordinates** (all in mm).
 
 ```
-XML pixel (x, y) + Z position → DICOM affine → World (x, y, z) mm
+XML pixel (x, y) + Z position → World (x, y, z) mm
 ```
 
 Steps:
-1. Find the DICOM slice matching the Z position
-2. Use that slice's affine to convert pixel → world
-3. Create annotation with world coordinates
+1. Find the DICOM imageId whose slice Z position matches `imageZposition`
+2. Convert pixel → world using `utilities.imageToWorldCoords(imageId, [xCoord, yCoord])` from `@cornerstonejs/core`
+3. Create the annotation with those world coordinates
+
+> **Note:** Do NOT use `viewport.canvasToWorld()` here — that converts screen pixel positions, not DICOM image pixel indices. See `CORNERSTONE_GUIDE.md` for a full explanation of the difference.
 
 ---
 
@@ -153,4 +152,4 @@ Steps:
 
 ## Next Steps
 
-Continue to `AI_INTEGRATION.md` to learn about AI segmentation tools.
+Continue to `MEDICAL_AI_MODEL.md` to learn about AI segmentation tools.

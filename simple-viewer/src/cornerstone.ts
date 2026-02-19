@@ -96,16 +96,21 @@ export function initTools() {
     bindings: [{ mouseButton: ToolEnums.MouseBindings.Primary }],
   })
 
-  // ─── TODO 1 ──────────────────────────────────────────────────────────────
-  // The scroll wheel does nothing right now. Activate StackScrollTool so the
-  // user can scroll through slices with the mouse wheel.
+  // Activate scroll wheel navigation
+  toolGroup.setToolActive(StackScrollTool.toolName, {
+    bindings: [{ mouseButton: ToolEnums.MouseBindings.Wheel }],
+  })
+
+  // ─── Curiosity prompt: Colormap ───────────────────────────────────────────
+  // The viewport renders in grayscale by default. After images load, you can
+  // tint the display by setting a colormap on the viewport:
   //
-  // Hint: look at how WindowLevelTool is activated above.
-  // Use MouseBindings.Wheel instead of MouseBindings.Primary.
+  //   const vp = renderingEngine.getViewport(VIEWPORT_ID) as any
+  //   vp.setProperties({ colormap: { name: 'jet' } })
+  //   vp.render()
   //
-  // toolGroup.setToolActive(StackScrollTool.toolName, {
-  //   bindings: [{ mouseButton: ToolEnums.MouseBindings.??? }],
-  // })
+  // Try it — what happens? Can you add a button to toggle between colormaps?
+  // Available names: 'jet', 'hot', 'cool', 'hsv', 'bone', 'copper' ...
   // ─────────────────────────────────────────────────────────────────────────
 }
 

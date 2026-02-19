@@ -33,8 +33,8 @@ Each TODO has a comment in the code explaining exactly what to do.
 
 ## Stack
 
-- React 18 + TypeScript
-- Vite 5
+- React 19 + TypeScript 5.8
+- Vite 7
 - Cornerstone3D v4 (`@cornerstonejs/core`, `@cornerstonejs/tools`, `@cornerstonejs/dicom-image-loader`)
 
 ## Getting Sample DICOM Files

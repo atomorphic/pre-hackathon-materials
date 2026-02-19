@@ -11,10 +11,11 @@ This folder contains **learning materials only** - no hackathon code to submit.
 
 | Item | Type | Time | Description |
 |------|------|------|-------------|
-| `docs/BACKGROUND.md` | Reading | 30-45 min | Medical imaging fundamentals |
-| `docs/CORNERSTONE_GUIDE.md` | Reading | 45-60 min | Cornerstone3D concepts & APIs |
-| `docs/LIDC_DATA_GUIDE.md` | Reading | 20-30 min | LIDC dataset and XML format |
-| `docs/MEDICAL_AI_MODEL.md` | Reading | 20-30 min | MONAI/TotalSegmentator concepts |
+| `docs/BACKGROUND.md` | Reading | ~20 min | Medical imaging fundamentals |
+| `docs/CORNERSTONE_GUIDE.md` | Reading | ~25 min | Cornerstone3D concepts & APIs |
+| `docs/LIDC_DATA_GUIDE.md` | Reading | ~10 min | LIDC dataset and XML format |
+| `docs/MEDICAL_AI_MODEL.md` | Reading | ~10 min | lungmask / TotalSegmentator / MONAI Label |
+| `simple-viewer/` | Hands-on | ~30 min (optional) | Working viewer to explore |
 
 ---
 

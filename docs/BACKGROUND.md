@@ -1,7 +1,7 @@
 # Background Knowledge: Medical Imaging & DICOM
 
 > **Atomorphic Mini Hackathon - Pre-Hackathon Reading**  
-> Estimated reading time: 30-45 minutes
+> Estimated reading time: ~20 minutes
 
 ---
 
@@ -149,28 +149,7 @@ The **affine matrix** converts between pixel and world coordinates:
 world_coordinate = Affine × pixel_coordinate
 ```
 
-### Building from DICOM
-
-```python
-import numpy as np
-
-def build_affine(ds):
-    ipp = np.array(ds.ImagePositionPatient)      # Origin
-    iop = np.array(ds.ImageOrientationPatient)   # Orientations
-    ps = np.array(ds.PixelSpacing)               # Spacing
-    
-    row_dir = iop[0:3]
-    col_dir = iop[3:6]
-    slice_dir = np.cross(row_dir, col_dir)
-    
-    affine = np.eye(4)
-    affine[0:3, 0] = row_dir * ps[1]
-    affine[0:3, 1] = col_dir * ps[0]
-    affine[0:3, 2] = slice_dir * ds.SliceThickness
-    affine[0:3, 3] = ipp
-    
-    return affine
-```
+The affine is built from three DICOM tags: **Image Position Patient** (origin), **Image Orientation Patient** (row/column directions), and **Pixel Spacing** (mm per pixel). You don't need to build it manually — Cornerstone3D handles this internally when loading DICOM files.
 
 ---
 
@@ -193,21 +172,7 @@ DICOM Files              3D Volume
 
 **Important**: Filename order ≠ spatial order!
 
-Sort by **Image Position Patient** projected onto slice normal:
-
-```python
-def sort_slices(slices):
-    # Get normal direction from first slice
-    iop = slices[0].ImageOrientationPatient
-    normal = np.cross(iop[0:3], iop[3:6])
-    
-    # Sort by position along normal
-    def position(s):
-        ipp = np.array(s.ImagePositionPatient)
-        return np.dot(ipp, normal)
-    
-    return sorted(slices, key=position)
-```
+Sort slices by projecting each slice's **Image Position Patient** onto the slice normal direction (derived from **Image Orientation Patient**). SimpleITK's `ImageSeriesReader` does this automatically.
 
 ---
 
@@ -242,9 +207,11 @@ Stored as coordinates with metadata:
 
 | Format | Extension | Use |
 |--------|-----------|-----|
-| DICOM SEG | .dcm | Clinical standard |
-| NIfTI | .nii.gz | Research/ML |
+| **DICOM SEG** | **.dcm** | **Clinical standard — used in the hackathon** |
+| NIfTI | .nii.gz | Research/ML pipelines (intermediate format) |
 | NRRD | .nrrd | 3D Slicer |
+
+> **Note:** During the hackathon, AI segmentation results are provided as **DICOM SEG** files. NIfTI may appear as an intermediate format in some pipelines, but the final output you will load into Cornerstone3D is DICOM SEG.
 
 ---
 
@@ -261,26 +228,10 @@ Pixels:      (0028,0010) Rows, (0028,0011) Columns
              (7FE0,0010) Pixel Data
 ```
 
-### Coordinate Conversion
-
-```python
-# Pixel to World
-world = affine @ [i, j, k, 1]
-
-# World to Pixel  
-pixel = np.linalg.inv(affine) @ [x, y, z, 1]
-```
-
-### Python Libraries
+### Python Libraries (for AI scripts)
 
 ```bash
-pip install pydicom nibabel SimpleITK numpy
-```
-
-```python
-import pydicom       # Read DICOM
-import nibabel       # Read NIfTI
-import SimpleITK     # Image processing
+pip install pydicom SimpleITK numpy
 ```
 
 ---
