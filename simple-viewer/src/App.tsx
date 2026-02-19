@@ -14,6 +14,7 @@ import {
   setNavigationTool,
   setActiveTool,
   getRenderingEngine,
+  setupResizeObserver,
   VIEWPORT_ID,
 } from './cornerstone'
 import { loadDicomFiles, loadSampleData, getImageIds } from './loader'
@@ -56,12 +57,15 @@ export default function App() {
     if (!viewportRef.current) return
     const el = viewportRef.current
 
+    let cleanupResize: (() => void) | undefined
+
     ;(async () => {
       try {
         setStatus('Initialising Cornerstone3D…')
         await initCornerstone()
         initViewport(el)
         initTools()
+        cleanupResize = setupResizeObserver(el)
 
         // Try to auto-load sample data from public/data/
         const n = await loadSampleData()
@@ -77,6 +81,8 @@ export default function App() {
         setStatus(`Error: ${err instanceof Error ? err.message : String(err)}`)
       }
     })()
+
+    return () => { cleanupResize?.() }
   }, [])
 
   // ── Listen for slice-changed events to update the slice counter ────────────
