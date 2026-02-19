@@ -366,4 +366,4 @@ PlanarFreehandROITool.toolName  // 'PlanarFreehandROI'
 
 ## Next Steps
 
-Play with the **simple-viewer** example to see these concepts in action!
+Continue to `LIDC_DATA_GUIDE.md` to understand the annotation format you'll work with on hackathon day.
