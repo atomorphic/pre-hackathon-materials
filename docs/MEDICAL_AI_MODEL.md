@@ -12,7 +12,6 @@ This guide covers three AI tools commonly used for automatic anatomical segmenta
 | Tool | What it does | GitHub | Speed (CPU) |
 |------|-------------|--------|-------------|
 | **TotalSegmentator** | Segments 117+ anatomical structures in CT/MR | [wasserth/TotalSegmentator](https://github.com/wasserth/TotalSegmentator) | ~10 min (fast mode) |
-| **lungmask** | Lung-only segmentation (left/right + lobes) | [JoHof/lungmask](https://github.com/JoHof/lungmask) | ~1–2 min |
 | **MONAI Label** | Server-based interactive labeling + AI inference | [Project-MONAI/MONAILabel](https://github.com/Project-MONAI/MONAILabel) | Variable |
 
 All three tools natively work with **NIfTI** (`.nii.gz`) files as input/output. Since DICOM is the clinical standard and what Cornerstone3D loads, a conversion step is needed:
@@ -119,62 +118,6 @@ This produces `lung.nii.gz` and `lung_nodules.nii.gz` — directly relevant to t
 
 ---
 
-## lungmask
-
-**GitHub:** [https://github.com/JoHof/lungmask](https://github.com/JoHof/lungmask) (769 stars, Apache-2.0)  
-**Paper:** [Hofmanninger et al., *Eur Radiol Exp*, 2020](https://doi.org/10.1186/s41747-020-00173-2)  
-**What it does:** Fast, lightweight lung segmentation. Produces left/right lung masks, with an optional lobe model. Works well even with severe pathologies (tumors, effusions, fibrosis).
-
-### Why use this?
-
-lungmask is a good choice when you need a **fast, focused** result on CPU — it segments lungs only in ~1–2 minutes, compared to TotalSegmentator's ~10 minutes for 117 structures.
-
-### Installation
-
-```bash
-pip install lungmask
-```
-
-Requires PyTorch. On Windows, install PyTorch first from [pytorch.org](https://pytorch.org).
-
-### CLI Usage
-
-```bash
-# Segment lungs (left/right) — default R231 model
-lungmask ct_volume.nii.gz lung_mask.nii.gz
-
-# Segment lung lobes (5 labels)
-lungmask ct_volume.nii.gz lobe_mask.nii.gz --modelname LTRCLobes
-
-# Direct DICOM input (reads the largest series from a folder)
-lungmask ./data/LIDC-IDRI-0001/ct/ lung_mask.nii.gz
-```
-
-### Python API
-
-The Python API wraps the CLI: create an `LMInferer` object, call `.apply(sitk_image)`, and get back a numpy array of labels. See the [lungmask README](https://github.com/JoHof/lungmask#readme) for details.
-
-### Output Labels
-
-**R231 model (default):**
-
-| Label | Structure |
-|-------|-----------|
-| 1 | Right lung |
-| 2 | Left lung |
-
-**LTRCLobes model:**
-
-| Label | Structure |
-|-------|-----------|
-| 1 | Left upper lobe |
-| 2 | Left lower lobe |
-| 3 | Right upper lobe |
-| 4 | Right middle lobe |
-| 5 | Right lower lobe |
-
----
-
 ## MONAI Label
 
 **GitHub:** [https://github.com/Project-MONAI/MONAILabel](https://github.com/Project-MONAI/MONAILabel) (812 stars, Apache-2.0)  
@@ -183,7 +126,7 @@ The Python API wraps the CLI: create an `LMInferer` object, call `.apply(sitk_im
 
 ### Key Concepts
 
-Unlike TotalSegmentator and lungmask (which are one-shot inference tools), MONAI Label is a **server-client system**:
+Unlike TotalSegmentator (which is a one-shot inference tool), MONAI Label is a **server-client system**:
 
 1. A Python server runs the AI model and exposes a REST API
 2. A viewer (3D Slicer, OHIF, etc.) connects as a client
@@ -244,7 +187,7 @@ DICOM slices (CT scan)
     ▼ (SimpleITK: dicom_to_nifti)
 NIfTI file (.nii.gz)
     │
-    ▼ (AI model: TotalSegmentator / lungmask / MONAI Label)
+    ▼ (AI model: TotalSegmentator / MONAI Label)
 Segmentation NIfTI (.nii.gz)
     │
     ▼ (convert to DICOM SEG — or use pre-computed file)
@@ -268,18 +211,16 @@ See `CORNERSTONE_GUIDE.md` — Segmentation section for how to load and display 
 ## Tips
 
 1. **Use `--fast` or `--roi_subset`** for TotalSegmentator to reduce runtime on CPU
-2. **lungmask is fastest** for lung-only segmentation (~1–2 min CPU) — good for a hackathon time constraint
-3. **Pre-compute results** if the model is too slow to run live — the hackathon provides pre-computed files
-4. **Verify alignment** — the segmentation must share the same origin, spacing, and direction as the source CT. If the overlay appears on the wrong slices, the coordinate systems don't match
-5. **Check orientation** — DICOM typically uses LPS (Left-Posterior-Superior), while NIfTI uses RAS (Right-Anterior-Superior). SimpleITK handles this conversion automatically, but be aware of it when debugging
-6. **DICOM SEG output** — TotalSegmentator supports `--output_type dicom_seg` directly (requires `pip install highdicom`)
+2. **Pre-compute results** if the model is too slow to run live — the hackathon provides pre-computed files
+3. **Verify alignment** — the segmentation must share the same origin, spacing, and direction as the source CT. If the overlay appears on the wrong slices, the coordinate systems don't match
+4. **Check orientation** — DICOM typically uses LPS (Left-Posterior-Superior), while NIfTI uses RAS (Right-Anterior-Superior). SimpleITK handles this conversion automatically, but be aware of it when debugging
+5. **DICOM SEG output** — TotalSegmentator supports `--output_type dicom_seg` directly (requires `pip install highdicom`)
 
 ---
 
 ## Further Reading
 
 - [TotalSegmentator README](https://github.com/wasserth/TotalSegmentator#readme) — full class list, advanced options, Docker usage
-- [lungmask README](https://github.com/JoHof/lungmask#readme) — model variants, limitations, COVID-19 model
 - [MONAI Label docs](https://monai.readthedocs.io/projects/label/en/latest/) — full API reference, tutorials, viewer integration
 - [MONAI Label tutorials](https://github.com/Project-MONAI/tutorials/tree/main/monailabel) — Jupyter notebooks for radiology, pathology, and endoscopy workflows
 - [highdicom](https://github.com/ImagingDataCommons/highdicom) — Python library for creating DICOM SEG files from numpy arrays
